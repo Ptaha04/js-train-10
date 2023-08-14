@@ -6,34 +6,27 @@
  * Повертаємо - Новий об'єкт з об'єднаними властивостями.
  */
 function customAssign(...objects) {
-  if (objects.length > 2) {
-    for (const element in objects) {
-      const stringObj = Object.assign(...objects);
-      //   for (const num in stringObj) {
-      //     if (isNaN(Object.values(stringObj))) {
-      //       return Object.values(stringObj).toString();
-      //     } else {
-      //       return Object.values(stringObj);
-      //     }
-
-      // const elemArr = stringObj[num].toString();
-      // return elemArr;
-      // return isNaN(stringObj[num])
-      //   ? Object.values(stringObj).toString()
-      //   : stringObj[num];
-      //   }
-      return stringObj;
-    }
-    // return (objects);
-  } else {
+  if (objects.length < 2) {
     return "Помилка: Має бути передано принаймні два об'єкти.";
   }
-  // Перевірка, чи передано достатньо об'єктів якщо ні повертаємо "Помилка: Має бути передано принаймні два об'єкти."
   // Використання методу `assign` для об'єднання об'єктів
-  // Перетворення числових значень на рядки, ітеруємо об'єкт за допомогою for in
-  // якщо значення типу число конвертуємо його в рядок
+  const mergedObject = Object.assign({}, ...objects);
+
+  for (const key in mergedObject) {
+    if (typeof mergedObject[key] === "number") {
+      // якщо значення типу число конвертуємо його в рядок
+      mergedObject[key] = String(mergedObject[key]);
+    }
+  }
+
   // Повернення нового об'єкта з об'єднаними та зміненими властивостями
+  return mergedObject;
 }
+// Перевірка, чи передано достатньо об'єктів якщо ні повертаємо "Помилка: Має бути передано принаймні два об'єкти."
+// Використання методу `assign` для об'єднання об'єктів
+// Перетворення числових значень на рядки, ітеруємо об'єкт за допомогою for in
+// якщо значення типу число конвертуємо його в рядок
+// Повернення нового об'єкта з об'єднаними та зміненими властивостями
 
 // Приклад використання функції customAssign
 console.log("Завдання: 1 ==============================");
@@ -81,32 +74,25 @@ console.log(
  * Повертаємо - Об'єкт, створений з записів з обробленими значеннями.
  */
 function customObjectFromEntries(entries) {
-  //   console.log(!isNaN(entries));
-  if (Array.isArray(entries)) {
-    const numToString = entries.map((elem) => {
-      //   console.log(elem);
-      //   return isNaN(Object.keys(elem))
-      //     ? Object.keys(elem).toString()
-      //     : Object.keys(elem);
-      return isNaN(Object.values(elem))
-        ? Object.values(elem).toString()
-        : Object.values(elem);
-      console.log(Object.values(elem));
-      //   return !isNaN(Object.keys(elem))
-      //     ? Object.keys(elem).toString()
-      //     : Object.keys(elem);
-    });
-    return numToString;
-  } else {
-    console.log("Помилка: Вхідний аргумент має бути масивом.");
+  if (!Array.isArray(entries)) {
+    return "Помилка: Вхідний аргумент має бути масивом.";
   }
+
   // Перевірка, чи вхідний аргумент є масивом,якщо ні повертаєм "Помилка: Вхідний аргумент має бути масивом."
   // Використання методу `map` для обробки значень властивостей
-  // Перевірка, чи ключ  є числом
-  // Перетворення числового значення на рядок
-  // Повернення обробленого запису [key, value]
+  const processedEntries = entries.map(([key, value]) => {
+    // Перевірка, чи ключ  є числом
+    if (typeof key === "number") {
+      // Перетворення числового значення на рядок
+      value = String(key);
+    }
+    // Повернення обробленого запису [key, value]
+    return [key, value];
+  });
   // Використання методу `fromEntries` для створення об'єкта з масиву записів
+  const obj = Object.fromEntries(processedEntries);
   // Повернення створеного об'єкта
+  return obj;
 }
 console.log("Завдання: 3 ==============================");
 
@@ -360,24 +346,30 @@ console.log(getObjectValuesSum({ a: 1, b: 2, c: 3 })); // Виведе 6
  * Повертаємо - Об'єкт, створений з масиву.
  */
 function convertArrayToObj(arr) {
-  //   console.log(arr);
-  //   let convertObj = {};
-  if (Array.isArray(arr)) {
-    return Object.fromEntries(arr);
-    // for (let i = 0; i < arr.length; i++) {
-    //   console.log(arr[i]);
-
-    // }
-  } else {
+  //   if (Array.isArray(arr)) {
+  //     return Object.fromEntries(arr);
+  //   } else {
+  //     return {};
+  //   }
+  // Перевіряємо, чи вхідний параметр є масивом, якщо ні, повертаємо пустий об'єкт
+  if (!Array.isArray(arr)) {
     return {};
   }
-  // Перевіряємо, чи вхідний параметр є масивом, якщо ні, повертаємо пустий об'єкт
   // Створюємо пустий об'єкт який записуємо в змінну
+  const obj = {};
   // Проходимося по кожному підмасиву в масиві за допопмогою циклу for, лічильник від нуля до довжини масиву
-  // Розпаковуємо підмасив за допомогою деструктурізації на окремі змінні для ключа та значення
-  // Перевіряємо, чи існує вже ключ в об'єкті,якщо так виводимо в консоль повідомлення `У масиві є дубльований ключ: ${key}`
-  // Додаємо ключ та значення до об'єкта
+  for (let i = 0; i < arr.length; i++) {
+    // Розпаковуємо підмасив за допомогою деструктурізації на окремі змінні для ключа та значення
+    const [key, value] = arr[i];
+    // Перевіряємо, чи існує вже ключ в об'єкті,якщо так виводимо в консоль повідомлення `У масиві є дубльований ключ: ${key}`
+    if (obj.hasOwnProperty(key)) {
+      console.log(`У масиві є дубльований ключ: ${key}`);
+    }
+    // Додаємо ключ та значення до об'єкта
+    obj[key] = value;
+  }
   // Застосовуємо метод Object.fromEntries() для створення об'єкта
+  return Object.fromEntries(arr);
 }
 
 console.log("Завдання: 12 ==============================");
